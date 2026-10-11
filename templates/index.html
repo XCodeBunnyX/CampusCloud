@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusCloud — Your Campus. Your Files. Your Cloud.</title>
+  <meta name="description" content="CampusCloud is a LAN-based distributed cloud storage system built on Apache Hadoop HDFS. Upload, manage, and share files across your campus network." />
+  <meta name="keywords" content="CampusCloud, HDFS, Hadoop, distributed storage, LAN cloud, file sharing" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6366f1"/>
+              <stop offset="1" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="40" height="40" rx="12" fill="url(#logoGrad)"/>
+          <path d="M12 26c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v1H12v-1z" fill="white" opacity="0.9"/>
+          <path d="M20 10c-3.3 0-6 2.7-6 6 0 .4 0 .7.1 1.1C12.4 17.6 11 19.1 11 21c0 2.2 1.8 4 4 4h10c2.2 0 4-1.8 4-4 0-1.9-1.4-3.4-3.1-3.9.1-.4.1-.7.1-1.1 0-3.3-2.7-6-6-6z" fill="white"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">CampusCloud</span>
+        <span class="logo-tagline">Distributed Storage</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-item active" id="nav-dashboard" onclick="showView('dashboard')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      <span>Dashboard</span>
+    </a>
+    <a href="#" class="nav-item" id="nav-files" onclick="showView('files')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      <span>My Files</span>
+      <span class="nav-badge" id="files-count">0</span>
+    </a>
+    <a href="#" class="nav-item" id="nav-upload" onclick="showView('upload')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+        <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+      </svg>
+      <span>Upload</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="hdfs-status" id="hdfs-status-indicator">
+      <div class="status-dot" id="status-dot"></div>
+      <div class="status-info">
+        <span class="status-label">HDFS Status</span>
+        <span class="status-value" id="hdfs-status-text">Checking...</span>
+      </div>
+    </div>
+    <div class="sidebar-meta">
+      <span>Hadoop 3.5.0 · WebHDFS</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+<main class="main-content">
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="page-title" id="page-title">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="showView('upload')" id="upload-btn-top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+          <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+        </svg>
+        Upload File
+      </button>
+    </div>
+  </header>
+
+  <!-- ════ VIEW: DASHBOARD ════ -->
+  <section class="view active" id="view-dashboard">
+    <div class="view-content">
+
+      <div class="hero-greeting">
+        <h1>Welcome to <span class="gradient-text">CampusCloud</span></h1>
+        <p>Your campus distributed cloud storage powered by Apache Hadoop HDFS.</p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card" id="stat-files">
+          <div class="stat-icon files-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value" id="dash-file-count">—</div>
+            <div class="stat-label">Files Stored</div>
+          </div>
+          <div class="stat-trend" id="dash-file-trend"></div>
+        </div>
+
+        <div class="stat-card" id="stat-storage">
+          <div class="stat-icon storage-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value" id="dash-storage-used">—</div>
+            <div class="stat-label">Storage Used</div>
+          </div>
+        </div>
+
+        <div class="stat-card" id="stat-hdfs">
+          <div class="stat-icon hdfs-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="4" rx="1"/>
+              <rect x="2" y="10" width="20" height="4" rx="1"/>
+              <rect x="2" y="17" width="20" height="4" rx="1"/>
+              <circle cx="18" cy="5" r="1" fill="currentColor"/>
+              <circle cx="18" cy="12" r="1" fill="currentColor"/>
+              <circle cx="18" cy="19" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value" id="dash-hdfs-status">—</div>
+            <div class="stat-label">HDFS NameNode</div>
+          </div>
+        </div>
+
+        <div class="stat-card" id="stat-replication">
+          <div class="stat-icon replication-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 3 21 3 21 8"/>
+              <line x1="4" y1="20" x2="21" y2="3"/>
+              <polyline points="21 16 21 21 16 21"/>
+              <line x1="15" y1="15" x2="21" y2="21"/>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-value">1×</div>
+            <div class="stat-label">Replication Factor</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Files -->
+      <div class="section-header">
+        <h2>Recent Files</h2>
+        <button class="btn btn-ghost" onclick="showView('files')">View All →</button>
+      </div>
+
+      <div class="files-table-wrapper" id="dash-recent-files">
+        <div class="loading-state" id="dash-loading">
+          <div class="spinner"></div>
+          <span>Loading files...</span>
+        </div>
+        <div class="empty-state hidden" id="dash-empty">
+          <div class="empty-icon">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64">
+              <path d="M32 8C18.7 8 8 18.7 8 32s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z"/>
+              <path d="M32 20v12M32 36v4"/>
+            </svg>
+          </div>
+          <h3>No files yet</h3>
+          <p>Upload your first file to get started.</p>
+          <button class="btn btn-primary" onclick="showView('upload')">Upload a File</button>
+        </div>
+        <table class="files-table hidden" id="dash-files-table">
+          <thead>
+            <tr>
+              <th>Filename</th>
+              <th>Size</th>
+              <th>Uploaded</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dash-files-tbody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════ VIEW: FILES ════ -->
+  <section class="view" id="view-files">
+    <div class="view-content">
+      <div class="section-header">
+        <h1>My Files</h1>
+        <div class="header-actions">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="search-input" placeholder="Search files…" oninput="filterFiles()" />
+          </div>
+          <button class="btn btn-primary" onclick="showView('upload')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Upload
+          </button>
+        </div>
+      </div>
+
+      <div class="files-table-wrapper">
+        <div class="loading-state" id="files-loading">
+          <div class="spinner"></div>
+          <span>Loading files...</span>
+        </div>
+        <div class="empty-state hidden" id="files-empty">
+          <div class="empty-icon">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" width="80" height="80">
+              <path d="M8 56V20l12-12h28a4 4 0 014 4v44a4 4 0 01-4 4H12a4 4 0 01-4-4z"/>
+              <path d="M8 20h12V8"/>
+              <line x1="20" y1="34" x2="44" y2="34"/>
+              <line x1="20" y1="42" x2="36" y2="42"/>
+            </svg>
+          </div>
+          <h3>No files stored yet</h3>
+          <p>Your uploaded files will appear here. They are stored directly in HDFS.</p>
+          <button class="btn btn-primary" onclick="showView('upload')">Upload Your First File</button>
+        </div>
+        <table class="files-table hidden" id="all-files-table">
+          <thead>
+            <tr>
+              <th>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Filename
+              </th>
+              <th>Size</th>
+              <th>SHA-256</th>
+              <th>Uploaded</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="all-files-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ VIEW: UPLOAD ════ -->
+  <section class="view" id="view-upload">
+    <div class="view-content">
+      <div class="section-header">
+        <h1>Upload File</h1>
+        <p class="section-sub">Files are stored directly in Apache Hadoop HDFS.</p>
+      </div>
+
+      <div class="upload-container">
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="drop-zone"
+             ondragover="dragOver(event)"
+             ondragleave="dragLeave(event)"
+             ondrop="dropFile(event)"
+             onclick="document.getElementById('file-input').click()">
+          <div class="drop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="56" height="56">
+              <polyline points="16 16 12 12 8 16"/>
+              <line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+            </svg>
+          </div>
+          <div class="drop-text">
+            <h3>Drag & drop your file here</h3>
+            <p>or <span class="drop-link">click to browse</span></p>
+          </div>
+          <div class="drop-meta">
+            <span>Maximum file size: 512 MB</span>
+          </div>
+          <input type="file" id="file-input" class="hidden" onchange="fileSelected(event)" />
+        </div>
+
+        <!-- Selected File Preview -->
+        <div class="file-preview hidden" id="file-preview">
+          <div class="preview-icon" id="preview-icon"></div>
+          <div class="preview-info">
+            <div class="preview-name" id="preview-name">filename.txt</div>
+            <div class="preview-size" id="preview-size">0 KB</div>
+          </div>
+          <button class="btn-icon remove-file" onclick="removeFile()" title="Remove file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Upload Progress -->
+        <div class="upload-progress hidden" id="upload-progress">
+          <div class="progress-info">
+            <span id="progress-filename">Uploading…</span>
+            <span id="progress-pct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-stage" id="progress-stage">Sending to HDFS…</div>
+        </div>
+
+        <!-- Upload Button -->
+        <div class="upload-actions">
+          <button class="btn btn-primary btn-large" id="upload-btn" onclick="uploadFile()" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+            </svg>
+            Upload to HDFS
+          </button>
+          <button class="btn btn-ghost" onclick="removeFile()">Cancel</button>
+        </div>
+
+        <!-- HDFS Info Panel -->
+        <div class="info-panel">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            How it works
+          </h4>
+          <ol>
+            <li>Your file is received by the CampusCloud Controller (Flask backend).</li>
+            <li>The controller validates the filename and file size.</li>
+            <li>The controller initiates a WebHDFS two-step PUT to the NameNode.</li>
+            <li>The NameNode returns a DataNode redirect URL (HTTP 307).</li>
+            <li>File data is streamed directly to the DataNode.</li>
+            <li>HDFS confirms storage. Metadata is recorded in SQLite.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════ TOAST NOTIFICATIONS ═══════════════════ -->
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<!-- ═══════════════════ DELETE MODAL ═══════════════════ -->
+<div class="modal-overlay hidden" id="delete-modal">
+  <div class="modal">
+    <div class="modal-icon danger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+        <path d="M10 11v6M14 11v6"/>
+        <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+      </svg>
+    </div>
+    <h3>Delete File?</h3>
+    <p>This will permanently delete <strong id="delete-filename"></strong> from HDFS. This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-btn" onclick="confirmDelete()">Delete from HDFS</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

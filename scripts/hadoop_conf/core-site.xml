@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  CampusCloud — core-site.xml
+  Configures the HDFS NameNode address (IPC port 9000)
+  and a writable temporary directory outside the source tree.
+-->
+<configuration>
+
+  <!-- NameNode URI for HDFS IPC -->
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://localhost:9000</value>
+    <description>Default filesystem — points to the local NameNode.</description>
+  </property>
+
+  <!-- Hadoop working/temp directory (kept outside the project source tree) -->
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value>/tmp/campuscloud-hadoop</value>
+    <description>Temporary directory for Hadoop daemons and HDFS data.</description>
+  </property>
+
+  <!-- Enable WebHDFS REST API -->
+  <property>
+    <name>dfs.webhdfs.enabled</name>
+    <value>true</value>
+  </property>
+
+</configuration>

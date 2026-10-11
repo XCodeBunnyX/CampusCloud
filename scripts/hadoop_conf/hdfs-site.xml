@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  CampusCloud — hdfs-site.xml
+  Single-machine pseudo-distributed HDFS.
+  Replication factor = 1 (only one node available).
+  WebHDFS REST API enabled on port 9870.
+  Conservative heap settings for 16 GB machine.
+-->
+<configuration>
+
+  <!-- Replication = 1 for single-node setup -->
+  <property>
+    <name>dfs.replication</name>
+    <value>1</value>
+    <description>
+      Pseudo-distributed mode: one copy per block.
+      In a real multi-node cluster, set to 3.
+    </description>
+  </property>
+
+  <!-- NameNode web UI and WebHDFS REST endpoint -->
+  <property>
+    <name>dfs.namenode.http-address</name>
+    <value>localhost:9870</value>
+    <description>WebHDFS and NameNode web UI port.</description>
+  </property>
+
+  <!-- Enable WebHDFS REST API -->
+  <property>
+    <name>dfs.webhdfs.enabled</name>
+    <value>true</value>
+  </property>
+
+  <!-- NameNode metadata storage -->
+  <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>file:///tmp/campuscloud-hadoop/dfs/name</value>
+  </property>
+
+  <!-- DataNode block storage -->
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>file:///tmp/campuscloud-hadoop/dfs/data</value>
+  </property>
+
+  <!-- Disable permissions for single-user dev environment -->
+  <property>
+    <name>dfs.permissions.enabled</name>
+    <value>false</value>
+    <description>
+      Disabled for local development convenience.
+      Enable and configure ACLs for production deployment.
+    </description>
+  </property>
+
+  <!-- Block size — 64 MB is sufficient for development files -->
+  <property>
+    <name>dfs.blocksize</name>
+    <value>67108864</value>
+  </property>
+
+  <!-- DataNode IPC port -->
+  <property>
+    <name>dfs.datanode.ipc.address</name>
+    <value>0.0.0.0:9867</value>
+  </property>
+
+</configuration>

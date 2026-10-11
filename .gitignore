@@ -1,0 +1,102 @@
+# ─── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+.env
+env.bak/
+venv.bak/
+
+# ─── Flask ─────────────────────────────────────────────────────────────────────
+instance/
+.webassets-cache
+flask_session/
+
+# ─── Database ──────────────────────────────────────────────────────────────────
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# ─── Secrets and Credentials ───────────────────────────────────────────────────
+.env
+*.pem
+*.key
+*.crt
+*.p12
+id_rsa
+id_rsa.pub
+
+# ─── Temporary Uploads ─────────────────────────────────────────────────────────
+tmp_uploads/
+uploads/
+
+# ─── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Hadoop / HDFS Runtime ─────────────────────────────────────────────────────
+hadoop_data/
+hdfs_data/
+namenode/
+datanode/
+hadoop-tmp/
+
+# ─── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# ─── JetBrains / VS Code / Editors ────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ─── Test Artifacts ────────────────────────────────────────────────────────────
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# ─── Misc ──────────────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.orig
